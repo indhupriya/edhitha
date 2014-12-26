@@ -42,10 +42,6 @@ def verifyTargetImage(image): # Function to carry out histogram backprojection a
 
 if __name__=="__main__":
 
-	print " Enter 'n' to view the next image"
-
-	print " Enter 't' if the image contains a target"
-
 	for i,img in enumerate([os.path.join(imageDumpPath,fn) for fn in next(os.walk(imageDumpPath))[2]]):
 		img = cv2.imread(img)
 		try:
