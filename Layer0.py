@@ -25,7 +25,7 @@ def verifyTargetImage(image): # Function to carry out histogram backprojection a
 
 	hsvImage = cv2.cvtColor(image,cv2.COLOR_BGR2HSV)	# Converting the RGB image to the HSV color space
 
-	hsvHistogram = cv2.calcHist([hsvImage],[0, 1], None, [256, 256], [0, 180, 0, 256] ) #   Calculating the histogram for channel 0(Hue) and channel 1(Saturation),
+	hsvHistogram = cv2.calcHist([hsvImage],[0, 1], None, [180, 256], [0, 180, 0, 256] ) #   Calculating the histogram for channel 0(Hue) and channel 1(Saturation),
 																						#	using a range of 0 to 180 for hue and 0 to 255 for saturation
 
 	dst = cv2.calcBackProject([hsvImage],[0,1],hsvHistogram,[0,180,0,256],1)	#Filtering out the respective channels on the image using the given ranges
