@@ -15,7 +15,7 @@ tkMessageBox.showinfo("Next step!", " Press 'N' to move to the next image and if
 def extractBlobs(image,origImage):	# UNFINISHED function that extracts the blob
 
 	image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) # Convert the image to a single channel grayscale image
-	image[image[:]<90]=0	# Neglect pixles with intensity less than 90
+	image[image[:]>90]=255	# Neglect pixles with intensity less than 90
 	mask = np.array(image,dtype = np.uint8)	# Create a mast using the backProjected image
 	bit = cv2.bitwise_and(origImage,origImage,mask = mask)	# bitwise and the mask and the orignal image to regain clarity
 	cv2.imwrite('./BlobbedImage.JPG',bit)
