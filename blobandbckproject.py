@@ -7,7 +7,7 @@ def extractblob(im):
 	contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
 	z=0;
 	for cnt in contours:
-   		print cv2.contourArea(cnt)
+   	  	print cv2.contourArea(cnt)
                 if cv2.contourArea(cnt)>1000 and cv2.contourArea(cnt)<3000:
      			cv2.drawContours(im,[cnt],0,(0,255,0),3)
      			x,y,w,h = cv2.boundingRect(cnt)
@@ -21,22 +21,41 @@ def extractblob(im):
 	cv2.waitKey(0)
 
 def backproject():
-  im = cv2.imread("/home/sony/DSC_0869.JPG")
-	roi = cv2.imread('DSC_0869cropped.JPG') 
-	roiHsv = cv2.cvtColor( roi, cv2.COLOR_BGR2HSV)
-	roiHist = cv2.calcHist([roiHsv],[0, 1], None, [256, 256], [0, 256, 0, 256] )
+        im = cv2.imread("/home/hadoop/DSC_0869.JPG")
+	#im = cv2.resize(im, None, fx = 0.25, fy = 0.25)
+	
+	#image => hsv, hist
 	hsv = cv2.cvtColor( im, cv2.COLOR_BGR2HSV)
-	bckP = cv2.calcBackProject([hsv], [0,1], roiHist,[0,256,0,256], 1)
-	ret,bckP = cv2.threshold(bckP,0,255,cv2.THRESH_BINARY_INV)
-	bckM = cv2.merge(( bckP, bckP, bckP)) 
-	mask = cv2.inRange(hsv, np.array([50,100,100], dtype = np.uint8), np.array([70,255,255], dtype = np.uint8))
+	#cv2.imshow("hsv", hsv)
+	imHist = cv2.calcHist([hsv], [0,1], None, [40, 200],[0,180,0,256])
+
+	bckP = cv2.calcBackProject([hsv], [0,1], imHist,[0,180,0,256], 1)
+	#cv2.imshow("bp", bckP)
+	kernel = cv2.getStructuringElement( cv2.MORPH_ELLIPSE, (3,3))
+	closing = cv2.morphologyEx(bckP, cv2.MORPH_CLOSE, kernel)
+	#cv2.imshow("eroded", closing)
+
+	##dst = cv2.filter2D(closing, -1,kernel)
+	##cv2.imshow('2d', dst)
+
+	ret,thresh = cv2.threshold(closing, 0, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+	#cv2.imshow("thresh", thresh)
+
+	fm1 =  cv2.merge((thresh,thresh,thresh))
+	res1 = cv2.bitwise_and(im, fm1, mask = None)# mask here has no significance
+        #cv2.imshow("first and", res1)
+	
+	#make (lower bound) G= 180 for proper target. G= 90 makes its edges disappear a leeettle
+	mask = cv2.inRange(hsv, np.array([5,90,50], dtype = np.uint8), np.array([49,255,205], dtype = np.uint8)) 
 	mask_inv = cv2.bitwise_not(mask)
-	finalBP =  cv2.bitwise_and(im, bckM, mask = mask_inv)
+	res = cv2.bitwise_and(res1, res1, mask = mask_inv)
+	cv2.imshow("final", res)
 	kernel=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(3,3))
-	res=cv2.erode(finalBP,kernel,iterations=1)
+	res=cv2.erode(res,kernel,iterations=1)
 	extractblob(res)
 
 	
 if __name__ == '__main__':
 	 backproject()
 	
+
