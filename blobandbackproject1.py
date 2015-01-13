@@ -42,7 +42,7 @@ def backproject():
 	#image => hsv, hist
 	hsv = cv2.cvtColor( im, cv2.COLOR_BGR2HSV)
 	#cv2.imshow("hsv", hsv)
-	imHist = cv2.calcHist([hsv], [0,1], None, [40, 200],[0,180,0,256])
+	imHist = cv2.calcHist([hsv], [0,1], None, [180, 256],[0,180,0,256])
 
 	bckP = cv2.calcBackProject([hsv], [0,1], imHist,[0,180,0,256], 1)
 	#cv2.imshow("bp", bckP)
